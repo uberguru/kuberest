@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #install some tools
-sudo apt-get install curl jq
+#sudo apt-get install curl jq
 
 #create a service account to access the api 
 kubectl create serviceaccount kubehack
@@ -28,28 +28,38 @@ echo $APISERVER
 
 curl -s $APISERVER/api/v1/namespaces/default/pods/ --header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt | jq -rM '.items[].metadata.name'
 
-
 curl -s $APISERVER/api/v1/nodes --header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt | jq -rM '.items[].metadata.name'
 
-# example without certificate
 
-
-
+# example without certificate 
 
 # list the nodes in my cluster just to test access
-curl --insecure --request GET \
-  --url "$APISERVER/api/v1/nodes" \
-  --header "Authorization: Bearer $TOKEN" \
-  --header "Content-Type: application/json" \
-  | jq '.items[] .metadata.labels'
+#curl --insecure --request GET \
+#  --url "$APISERVER/api/v1/nodes" \
+#  --header "Authorization: Bearer $TOKEN" \
+#  --header "Content-Type: application/json" \
+#  | jq '.items[] .metadata.labels'
 
-
-curl -s http://$APISERVER/api/v1/namespaces/default/pods \
---header "Authorization: Bearer $TOKEN" \
+#deploy a pod via rest
+curl -s $APISERVER/api/v1/namespaces/default/pods \
 -XPOST -H 'Content-Type: application/json' \
--d@nginx-pod.json \
+-d@nginx-pod.json --header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt \
 | jq '.status'
 
-#-d@nginx-pod.json \
+sleep 5
+
+#creat service endpoint
+curl -s $APISERVER/api/v1/namespaces/default/services \
+-XPOST -H 'Content-Type: application/json' \
+-d@nginx-service.json --header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt \
+| jq '.spec.clusterIP'
+
+#Delete Cleanup Example
+
+#curl $APISERVER/api/v1/namespaces/default/services/nginx-service -XDELETE \
+#--header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt
+
+#curl $APISERVER/api/v1/namespaces/default/pods/nginx -XDELETE \
+#--header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt
 
 
