@@ -31,7 +31,7 @@ curl -s $APISERVER/api/v1/namespaces/default/pods/ --header "Authorization: Bear
 curl -s $APISERVER/api/v1/nodes --header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt | jq -rM '.items[].metadata.name'
 
 
-# example without certificate 
+# example without certificate (because its a self signed)
 
 # list the nodes in my cluster just to test access
 #curl --insecure --request GET \
@@ -54,12 +54,11 @@ curl -s $APISERVER/api/v1/namespaces/default/services \
 -d@nginx-service.json --header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt \
 | jq '.spec.clusterIP'
 
-#Delete Cleanup Example
+#Delete Cleanup Example cleaning up the pods. 
 
 #curl $APISERVER/api/v1/namespaces/default/services/nginx-service -XDELETE \
 #--header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt
 
 #curl $APISERVER/api/v1/namespaces/default/pods/nginx -XDELETE \
 #--header "Authorization: Bearer $TOKEN" --cacert /tmp/ca.crt
-
 
